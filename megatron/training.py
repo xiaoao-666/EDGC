@@ -809,7 +809,6 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
         total_loss_dict[advanced_iters_key] = 0
         total_loss_dict[skipped_iters_key] = 0
         total_loss_dict[nan_iters_key] = 0
-        print_rank_0(log_string)
         print_rank_last(log_string)
         if report_memory_flag and learning_rate > 0.:
             # Report memory after optimizer state has been initialized.

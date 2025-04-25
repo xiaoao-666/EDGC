@@ -101,7 +101,6 @@ class Utils:
         entropy_change = abs(curr_mean - prev_mean)
 
         min_entropy_change = 0.0
-        # 固定使用最早两个窗口的均值差作为最大参考值
         if args.is_loading_checkpoint:
             first_save_interval = read_data_from_csv(args.entropy_path, args.save_interval)
         else:
@@ -117,7 +116,6 @@ class Utils:
         mapped_rank = round(mapped_rank)
         mapped_rank = max(min_rank, min(mapped_rank, max_rank))
         mapped_rank = (mapped_rank // 2) * 2
-        # 平滑控制映射 rank 变化
         if not Utils.mapped_rank:
             final_rank = mapped_rank if (max_rank - mapped_rank) <= step else (max_rank - step)
         else:

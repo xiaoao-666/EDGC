@@ -22,7 +22,7 @@ from megatron import get_args
 from megatron import mpu
 from .module import MegatronModule
 from megatron.mpu.reducers import PowerSGDReducer
-from megatron.schedules_utils import Utils
+from megatron.schedules_utils import Utils, append_init_error_to_csv, read_error_from_csv
 
 
 class MemoryBuffer:
@@ -294,13 +294,13 @@ class DistributedDataParallel(DistributedDataParallelBase):
     def _handle_compression_error(self, tensor, should_sample, is_rank_0):
         if self.args.find_rank_upper_limit and not self.initial_error:
             if self.args.is_loading_checkpoint:
-                self.max_rank_error = float(Utils.read_error_from_csv(self.args.max_error_path))
+                self.max_rank_error = float(read_error_from_csv(self.args.max_error_path))
             else:
                 self.max_rank_error = self._eval_error(tensor, self.args.max_rank)
-                Utils.append_init_error_to_csv(self.args.max_error_path, self.max_rank_error)
+                append_init_error_to_csv(self.args.max_error_path, self.max_rank_error)
             self.initial_error = True
 
-        if self.current_iter % self.args.window_size == 0 and self.current_iter != 0 and is_rank_0 and self.args.compute_end_warm_up is None:
+        if self.args.curr_iteration % self.args.window_size == 0 and self.args.curr_iteration != 0 and is_rank_0 and self.args.compute_end_warm_up is None:
             self.min_rank_error = self._eval_error(tensor, int(self.args.max_rank / 4))
             if self.min_rank_error < self.max_rank_error:
                 self.args.compute_end_warm_up = self.args.curr_iteration
